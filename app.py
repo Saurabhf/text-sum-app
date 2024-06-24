@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from langchain.prompts import ChatPromptTemplate
+from langchain.prompts import PromptTemplate
 from langchain_huggingface.llms import HuggingFacePipeline
 from langserve import add_routes
 import uvicorn
@@ -12,20 +12,14 @@ llm = HuggingFacePipeline.from_model_id(
 )
 
 # 1. Create prompt template
-system_template = "Summaraize the given text: {text}:"
-prompt_template = ChatPromptTemplate.from_messages([
-    ('system', system_template),
-    ('user', '{text}')
-])
+template = """Summaraize the given text: {text}"""
+prompt_template = PromptTemplate.from_template(template)
 
-# 2. Create model
-model = llm
-
-# 3. Create parser
+# 2. Create parser
 parser = StrOutputParser()
 
-# 4. Create chain
-chain = prompt_template | model | parser
+# 3. Create chain
+chain = prompt_template | llm | parser
 
 
 # 4. App definition
